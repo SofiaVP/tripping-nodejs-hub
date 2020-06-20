@@ -4,13 +4,6 @@ const apiRouter = express.Router();
 
 var myGenericMongoClient = require('./my_generic_mongo_client');
 
-// var nodefetch = require('/node-fetch')
-
-
-
-
-//++++++++++++++++++++++ HELP++++++++++++++++++++++++++++++++++++++//
-//+++++++++++++ ça fait quoi ces 2 fonctions??+++++++++++++++++++++//
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 function replace_mongoId_byCode(meteo){
 	meteo.name = meteo._id;
@@ -18,14 +11,36 @@ function replace_mongoId_byCode(meteo){
 	return meteo;
 }
 
-function replace_mongoId_byCode_inArray(deviseArray){
-	for(i in deviseArray){
-		replace_mongoId_byCode(deviseArray[i]);
+function replace_mongoId_byCode_inArray(meteoArray){
+	for(i in meteoArray){
+		replace_mongoId_byCode(meteoArray[i]);
 	}
-	return deviseArray;
+	return meteoArray;
 }
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
-//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
+
+
+// GET current weather from api + save in mongo 
+// exemple URL: http://localhost:8282/weather-api/public/weather/nyon
+apiRouter.route('/weather-api/public/weather/:name')
+.post(async function(req, res, next){
+	console.log("+++++++++++++++ Dans methode get and save current weather+++++++++++++++++++++++")
+	var cityName = req.params.name;
+	const fetch = require("node-fetch");
+	const url = "http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=2d0c2252a4bc29b72d473be3efad81e1&units=metric";
+	const response = await fetch(url);
+	const json = await response.json();
+	//const jsont = await json.name();  
+	myGenericMongoClient.genericInsertOne('mockweathercollection', json,function(err,meteo){res.send(
+		{
+			name: json.name, 
+			dt: json.dt, 
+			temp: json.main.temp,
+			feels_like: json.main.feels_like, 
+			sunrise: json.sys.sunrise, 
+			sunset: json.sys.sunset
+		 })} )
+} )
 
 
 //GET weather from city in mongo 
@@ -41,17 +56,5 @@ apiRouter.route('/weather-api/public/weather/:name')
 	
 });
 
-
-// GET weather from api + save in mongo 
-// exemple URL: http://localhost:8282/weather-api/public/weather/nyon
-apiRouter.route('/weather-api/public/weather/:name')
-.post(async function(req, res, next){
-	var cityName = req.params.name;
-	const fetch = require("node-fetch");
-	const url = "http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=2d0c2252a4bc29b72d473be3efad81e1&units=metric";
-	const response = await fetch(url);
-	const json = await response.json();
-	myGenericMongoClient.genericInsertOne('mockweathercollection', json,function(err,meteo){res.send(json)} )
-} )
 
 exports.apiRouter = apiRouter;
