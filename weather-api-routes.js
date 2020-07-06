@@ -40,7 +40,7 @@ function replace_mongoId_byCode_inArray(meteoArray){
 
 
 // JUST GET CURRENT WEATHER FROM API 
-// exemple URL: http://localhost:8282/weather-api/current/toulouse
+// exemple URL:http://localhost:8282/weather-api/current/Toulouse
 apiRouter.route('/weather-api/current/:name')
 .get(async function(req, res, next){
 	var name = req.params.name; 
@@ -56,39 +56,19 @@ apiRouter.route('/weather-api/current/:name')
 			sunrise: json.sys.sunrise, 
 			sunset: json.sys.sunset
 		 })
-
-	
-	// const getData = async url => {
-	// 	try {
-	// 	  const response = await fetch(url);
-	// 	  const json = await response.json();
-	// 	  console.log(json);
-	// 	  //exports json = json;
-	// 	  res.send(json)
-	// 	} catch (error) {
-	// 	  console.log(error);
-	// 	}
-	//   };
-	
-	//const weatherres = await getData(url);
-	//res.send(weatherres);
-	//console.log(weatherres);
-	// const response = await fetch(url);
-	// const json = await response.json();
-	// console.log(json);
-	// res.send(json
-	// 	// {
-	// 	// 	name: json.name, 
-	// 	// 	dt: json.dt, 
-	// 	// 	temp: json.main.temp,
-	// 	// 	feels_like: json.main.feels_like,   
-	// 	// 	sunrise: json.sys.sunrise, 
-	// 	// 	sunset: json.sys.sunset
-	// 	//  }
-	// 	)
-
 })
 
+// GET 7 DAYS FORCAST WEATHER FROM API 
+// exemple URL:http://localhost:8282/weather-api/forcast/48.85/2.35
+apiRouter.route('/weather-api/forcast/:lat/:lon')
+.get(async function(req, res, next){
+	var lat = req.params.lat; 
+	var lon = req.params.lon;
+	const url = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lon+"&exclude=current,minutely,hourly&appid=2d0c2252a4bc29b72d473be3efad81e1&units=metric";
+	const response = await fetch(url);
+	const json = await response.json();
+	res.send(json)
+})
 
 
 // GET current weather from api + save in mongo 
@@ -127,5 +107,45 @@ apiRouter.route('/weather-api/public/weather/:name')
 	
 });
 
+
+
+// var options = {
+// 	method: 'POST',
+// 	url: 'https://google-translate1.p.rapidapi.com/language/translate/v2',
+// 	headers: {
+// 	  'x-rapidapi-host': 'google-translate1.p.rapidapi.com',
+// 	  'x-rapidapi-key': 'e4e1fcc1abmsh2eaa2c495efe338p11a8e4jsn73d851eb5b14',
+// 	  'accept-encoding': 'application/gzip',
+// 	  'content-type': 'application/x-www-form-urlencoded',
+// 	  useQueryString: true
+// 	},
+// 	form: {source: 'en', q: 'Hello, world!', target: 'es'}
+//   };
+  
+//   request(options, function (error, response, body) {
+// 	  if (error) throw new Error(error);
+  
+// 	  console.log(body);
+//   });
+
+
+// // exemple URL:http://localhost:8282/translate
+// apiRouter.route('/translate')
+// .post(async function(req, res, next){
+// 	var xRapidapiHost = req.params.headers.x-rapidapi-host; 
+// 	var xRapidapiKey =  req.params.headers.x-rapidapi-key; 
+// 	var acceptEncoding = req.params.headers.accept-encoding;
+// 	var contentType = req.params.headers.content-type;
+
+// 	var source = req.params.body.source; 
+// 	var q = req.params.body.q; 
+// 	var target = req.params.body.target; 
+
+//  	const url = 'https://google-translate1.p.rapidapi.com/language/translate/v2';
+
+// 	const response = await fetch(url);
+// 	const json = await response.json();
+// 	res.send(json)
+// })
 
 exports.apiRouter = apiRouter;
