@@ -2,24 +2,28 @@ var express = require('express');
 const request = require('request');
 const apiRouter = express.Router();
 const fetch = require("node-fetch");
+require('dotenv').config();
+
 
 var myGenericMongoClient = require('./my_generic_mongo_client');
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY
 
 
-//const fetch = require("node-fetch");
-//const url = "https://jsonplaceholder.typicode.com/posts/1";
 
-const getData = async url => {
-	try {
-	  const response = await fetch(url);
-	  const json = await response.json();
-	  //console.log(json);
-	  //exports json = json;
-	  //res.send(json)
-	} catch (error) {
-	  console.log(error);
-	}
-  };
+// //const fetch = require("node-fetch");
+// //const url = "https://jsonplaceholder.typicode.com/posts/1";
+
+// const getData = async url => {
+// 	try {
+// 	  const response = await fetch(url);
+// 	  const json = await response.json();
+// 	  //console.log(json);
+// 	  //exports json = json;
+// 	  //res.send(json)
+// 	} catch (error) {
+// 	  console.log(error);
+// 	}
+//   };
 
 
 
@@ -44,7 +48,7 @@ function replace_mongoId_byCode_inArray(meteoArray){
 apiRouter.route('/weather-api/current/:name')
 .get(async function(req, res, next){
 	var name = req.params.name; 
-	const url = "http://api.openweathermap.org/data/2.5/weather?q="+name+"&appid=2d0c2252a4bc29b72d473be3efad81e1&units=metric";
+	const url = "http://api.openweathermap.org/data/2.5/weather?q="+name+"&appid="+WEATHER_API_KEY+"&units=metric";
 	const response = await fetch(url);
 	const json = await response.json();
 	res.send(
@@ -58,16 +62,41 @@ apiRouter.route('/weather-api/current/:name')
 		 })
 })
 
-// GET 7 DAYS FORCAST WEATHER FROM API 
+// GET 7 DAYS FORCAST WEATHER FROM API with coord
 // exemple URL:http://localhost:8282/weather-api/forcast/48.85/2.35
 apiRouter.route('/weather-api/forcast/:lat/:lon')
 .get(async function(req, res, next){
 	var lat = req.params.lat; 
 	var lon = req.params.lon;
-	const url = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lon+"&exclude=current,minutely,hourly&appid=2d0c2252a4bc29b72d473be3efad81e1&units=metric";
+	console.log(WEATHER_API_KEY);
+	const url = "https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"&lon="+lon+"&exclude=current,minutely,hourly&APPID="+WEATHER_API_KEY+"&units=metric";
 	const response = await fetch(url);
 	const json = await response.json();
 	res.send(json)
+})
+
+
+// GET 7 DAYS FORCAST WEATHER FROM API with cityname
+// exemple URL:http://localhost:8282/weather-api/forcast/paris
+apiRouter.route('/weather-api/forcast/:cityname')
+.get(async function(req, res, next){
+	var cityname = req.params.cityname; 
+	const url = "http://api.openweathermap.org/data/2.5/forecast?q="+cityname+"&appid="+WEATHER_API_KEY+"&units=metric";
+	const response = await fetch(url);
+	const json = await response.json();
+	const count = json.cnt;
+	console.log(count)
+	const forcastPretty = []; 
+	for(i=0; i<count; i++){
+		const weather = {
+			date: json.list[i].dt_txt,
+			temp: json.list[i].main.temp,
+			feels_like: json.list[i].main.feels_like, 
+			icon: json.list[i].weather[0].icon
+		}
+		forcastPretty.push(weather);
+	}
+	res.send(forcastPretty);		
 })
 
 
@@ -78,7 +107,7 @@ apiRouter.route('/weather-api/public/weather/:name')
 	console.log("+++++++++++++++ Dans methode get and save current weather+++++++++++++++++++++++")
 	var cityName = req.params.name;
 	
-	const url = "http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid=2d0c2252a4bc29b72d473be3efad81e1&units=metric";
+	const url = "http://api.openweathermap.org/data/2.5/weather?q="+cityName+"&appid="+WEATHER_API_KEY+"&units=metric";
 	const response = await fetch(url);
 	const json = await response.json();
 	//const jsont = await json.name();  
@@ -107,45 +136,5 @@ apiRouter.route('/weather-api/public/weather/:name')
 	
 });
 
-
-
-// var options = {
-// 	method: 'POST',
-// 	url: 'https://google-translate1.p.rapidapi.com/language/translate/v2',
-// 	headers: {
-// 	  'x-rapidapi-host': 'google-translate1.p.rapidapi.com',
-// 	  'x-rapidapi-key': 'e4e1fcc1abmsh2eaa2c495efe338p11a8e4jsn73d851eb5b14',
-// 	  'accept-encoding': 'application/gzip',
-// 	  'content-type': 'application/x-www-form-urlencoded',
-// 	  useQueryString: true
-// 	},
-// 	form: {source: 'en', q: 'Hello, world!', target: 'es'}
-//   };
-  
-//   request(options, function (error, response, body) {
-// 	  if (error) throw new Error(error);
-  
-// 	  console.log(body);
-//   });
-
-
-// // exemple URL:http://localhost:8282/translate
-// apiRouter.route('/translate')
-// .post(async function(req, res, next){
-// 	var xRapidapiHost = req.params.headers.x-rapidapi-host; 
-// 	var xRapidapiKey =  req.params.headers.x-rapidapi-key; 
-// 	var acceptEncoding = req.params.headers.accept-encoding;
-// 	var contentType = req.params.headers.content-type;
-
-// 	var source = req.params.body.source; 
-// 	var q = req.params.body.q; 
-// 	var target = req.params.body.target; 
-
-//  	const url = 'https://google-translate1.p.rapidapi.com/language/translate/v2';
-
-// 	const response = await fetch(url);
-// 	const json = await response.json();
-// 	res.send(json)
-// })
 
 exports.apiRouter = apiRouter;
