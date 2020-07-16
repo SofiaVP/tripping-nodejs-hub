@@ -2,11 +2,11 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
-
+require('dotenv').config();
 
 //++++++++++++++++++++++++Là+++++++++++++++++++++++++++++++++++++++
-var mongoDbUrl = 'mongodb://127.0.0.1:27017/weathertrip'; //by default
-var dbName = "weathertrip" //by default
+var mongoDbUrl = process.env.MONGO_DB_URl; //by default
+var dbName = process.env.DB_NAME //by default
 var currentDb=null; //current MongoDB connection
 
 var setMongoDbUrl = function(dbUrl){
