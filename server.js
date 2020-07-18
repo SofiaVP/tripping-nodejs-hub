@@ -14,6 +14,11 @@ res.header("Access-Control-Allow-Headers",
 next();
 });
 
+//app.use(express.static('./dist/my-node-server'));
+// app.get('/*', function (request, response) {
+//     response.sendFile(path.join(__dirname, '/html/index.html'));
+// });
+
 
 //support parsing of JSON post data
 var jsonParser = bodyParser.json() ;
@@ -32,6 +37,8 @@ res.redirect('/html/index.html');
 app.use(weatherApiRoutes.apiRouter); //delegate REST API routes to apiRouter(s)
 //app.use(produitApiRoutes.apiRouter); 
 
-app.listen(8282 , function () {
-console.log("http://localhost:8282");
-});
+// app.listen(8282 , function () {
+// console.log("http://localhost:8282");
+// });
+
+app.listen(process.env.PORT || 8282);
