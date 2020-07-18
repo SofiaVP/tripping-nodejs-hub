@@ -6,9 +6,11 @@ require('dotenv').config();
 
 //++++++++++++++++++++++++Là+++++++++++++++++++++++++++++++++++++++
 // var mongoDbUrl = process.env.MONGO_DB_URl; //by default
-var mongoDbUrl = "mongodb://heroku_j8f80drf:7bls156755p7a393up4rlu19c1@ds123753.mlab.com:23753/heroku_j8f80drf"; //by default
+// var mongoDbUrl = "mongodb+srv://root:motdepasse@cluster0.7gokj.mongodb.net/weathertrip?retryWrites=true&w=majority"; //by default
+var mongoDbUrl = process.env.MONGO_DB_URl; //by default
 // var dbName = process.env.DB_NAME //by default
-var dbName = "heroku_j8f80drf"//by default
+// var dbName = "weathertrip"//by default
+var dbName = process.env.DB_NAME//by default
 var currentDb=null; //current MongoDB connection
 
 var setMongoDbUrl = function(dbUrl){

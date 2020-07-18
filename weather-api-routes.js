@@ -6,7 +6,7 @@ require('dotenv').config();
 
 
 var myGenericMongoClient = require('./my_generic_mongo_client');
-const WEATHER_API_KEY = process.env.WEATHER_API_KEY
+const WEATHER_API_KEY = process.env.WEATHER_API_KEY 
 
 //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++//
 function replace_mongoId_byCode(meteo){
